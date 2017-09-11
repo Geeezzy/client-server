@@ -2,12 +2,21 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
+
+//Users структура для парсинга json
+type Users struct {
+	Id        string `json:id`
+	Name      string `json:"name"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+}
 
 //go get -u github.com/gorilla/mux
 var (
@@ -18,19 +27,26 @@ var (
 const PORT string = ":8080"
 
 func hundler(w http.ResponseWriter, r *http.Request) {
-	var username string
-	rows, err := db.Query("SELECT username FROM users")
+
+	//users := []Users{}
+	//var username string
+	rows, err := db.Query("SELECT * FROM users")
 	PanicOnErr(err)
+	defer rows.Close()
+
+	users := make([]*Users, 0)
+
 	for rows.Next() {
-
-		err = rows.Scan(&username)
+		us := new(Users)
+		err = rows.Scan(&us.Id, &us.Name, &us.FirstName, &us.LastName)
 		PanicOnErr(err)
-		//fmt.Println("rows.Next username: ", username)
+		users = append(users, us)
 	}
-	rows.Close()
-
-	w.Write([]byte("rows.Next username: "))
-	w.Write([]byte(username))
+	PanicOnErr(err)
+	productsJson, _ := json.Marshal(users)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(productsJson)
 }
 
 func main() {
