@@ -3,28 +3,31 @@ package main
 import (
 	"io/ioutil"
 	"net/http"
+	"os"
+
+	cli "github.com/jawher/mow.cli"
+	//"github.com/jawher/mow.cli"
 )
 
+const DEFAULT_HOST = "http://localhost:8080"
+
 func main() {
-	// app := cli.App("cp", "Copy files around")
 
-	// app.Spec = "[-r] SRC... DST"
+	app := cli.App("docker", "A self-sufficient runtime for linux containers")
 
-	// var (
-	// 	recursive = app.BoolOpt("r recursive", false, "Copy files recursively")
-	// 	src       = app.StringsArg("SRC", nil, "Source files to copy")
-	// 	dst       = app.StringArg("DST", "", "Destination where to copy files to")
-	// )
+	app.Command("getusers", "Run a command request for full users ", func(cmd *cli.Cmd) {
 
-	// app.Action = func() {
-	// 	fmt.Printf("Copying %v to %s [recursively: %v]\n", *src, *dst, *recursive)
-	// }
+		cmd.Action = func() {
 
-	// app.Run(os.Args)
+			res, _ := http.Get(DEFAULT_HOST)
 
-	res, _ := http.Get("http://localhost:8080")
+			body, _ := ioutil.ReadAll(res.Body)
 
-	body, _ := ioutil.ReadAll(res.Body)
+			println(string(body))
 
-	println(string(body))
+		}
+
+	})
+
+	app.Run(os.Args)
 }
