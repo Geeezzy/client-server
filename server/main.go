@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -26,7 +27,29 @@ var (
 //PORT Порт
 const PORT string = ":8080"
 
-func hundler(w http.ResponseWriter, r *http.Request) {
+func main() {
+	DBconnect()
+	//Run server and routes
+	r := mux.NewRouter()
+
+	//Получить всех пользователей
+	r.HandleFunc("/getallusers", handler).Methods("GET")
+	//Создать пользователя
+	r.HandleFunc("/createuser", createUsers).Methods("POST")
+	//Удалить пользователя
+	r.HandleFunc("/deleteuser", deleteUser).Methods("DELETE")
+	//Получить пользователя по id
+	r.HandleFunc("/getuser", handler).Methods("GET")
+	//Обновить пользователя
+	r.HandleFunc("/update", updateUser).Methods("PUT")
+
+	log.Println("Server up and run on port " + PORT)
+	log.Fatal(http.ListenAndServe(PORT, r))
+
+}
+
+// func handler | Use for get all users
+func handler(w http.ResponseWriter, r *http.Request) {
 
 	//users := []Users{}
 	//var username string
@@ -49,14 +72,38 @@ func hundler(w http.ResponseWriter, r *http.Request) {
 	w.Write(productsJson)
 }
 
-func main() {
-	DBconnect()
-	//Run server and routes
-	r := mux.NewRouter()
-	r.HandleFunc("/", hundler).Methods("GET")
-	log.Println("Server up and run on port " + PORT)
-	log.Fatal(http.ListenAndServe(PORT, r))
+func createUsers(w http.ResponseWriter, r *http.Request) {
+	name := r.FormValue("name")
+	first_name := r.FormValue("first_name")
+	last_name := r.FormValue("last_name")
 
+	//Check for empty values
+	if name == "" || first_name == "" || last_name == "" {
+		http.Error(w, http.StatusText(400), 400)
+		return
+	}
+
+	//INSERT
+	result, err := db.Exec("INSERT INTO users VALUES($1, $2, $3)", name, first_name, last_name)
+	PanicOnErr(err)
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	fmt.Fprintf(w, "User %s created successfully (%d row affected)\n", name, rowsAffected)
+
+}
+
+func deleteUser(w http.ResponseWriter, r *http.Request) {
+	//deleteUsers
+}
+
+func updateUser(w http.ResponseWriter, r *http.Request) {
+	//update
 }
 
 //DBconnect run and connect DB
