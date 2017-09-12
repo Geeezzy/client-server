@@ -39,7 +39,7 @@ func main() {
 	//Удалить пользователя
 	r.HandleFunc("/deleteuser", deleteUser).Methods("DELETE")
 	//Получить пользователя по id
-	r.HandleFunc("/getuser", handler).Methods("GET")
+	r.HandleFunc("/getuser", handlerUser).Methods("GET")
 	//Обновить пользователя
 	r.HandleFunc("/update", updateUser).Methods("PUT")
 
@@ -98,8 +98,30 @@ func createUsers(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func handlerUser(w http.ResponseWriter, r *http.Request) {
+	id := r.FormValue("id")
+
+	if id == "" {
+		http.Error(w, http.StatusText(400), 400)
+		return
+	}
+
+	row := db.QueryRow("SELECT * FROM users WHERE id = $1", id)
+
+	us := new(Users)
+
+	err := row.Scan(&us.Id, &us.Name, &us.FirstName, &us.LastName)
+	PanicOnErr(err)
+
+	productsJson, _ := json.Marshal(us)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(productsJson)
+}
+
 func deleteUser(w http.ResponseWriter, r *http.Request) {
 	//deleteUsers
+
 }
 
 func updateUser(w http.ResponseWriter, r *http.Request) {
