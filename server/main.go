@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"reflect"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -73,28 +74,25 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func createUsers(w http.ResponseWriter, r *http.Request) {
-	name := r.FormValue("name")
-	first_name := r.FormValue("first_name")
-	last_name := r.FormValue("last_name")
+	decoder := json.NewDecoder(r.Body)
+	user := Users{}
 
-	//Check for empty values
-	if name == "" || first_name == "" || last_name == "" {
-		http.Error(w, http.StatusText(400), 400)
-		return
-	}
-
-	//INSERT
-	result, err := db.Exec("INSERT INTO users VALUES($1, $2, $3)", name, first_name, last_name)
-	PanicOnErr(err)
-
-	rowsAffected, err := result.RowsAffected()
-
+	err := decoder.Decode(&user)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	fmt.Fprintf(w, "User %s created successfully (%d row affected)\n", name, rowsAffected)
+	fmt.Println(reflect.TypeOf(user.Name))
+
+	//users = append(users, user)
+
+	//INSERT
+
+	result, err := db.Exec("INSERT INTO users (username, first_name, last_name) VALUES ($1, $2, $3)", user.Name, user.FirstName, user.LastName)
+	PanicOnErr(err)
+
+	fmt.Println(result)
 
 }
 
