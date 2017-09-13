@@ -15,14 +15,19 @@
 Данные хранить в postgresql. Сервер и postgresql запускать в docker.
 
 Консольный клиент(CLI) реализовать с использованием пакета https://github.com/jawher/mow.cli.
+
 Команды CLI должны уметь работать с реализованными роутами сервера.
 Пример:
+
 cli create user -f <path_to_json>
+
 path_to_json - путь к json файлу где описана структура пользователя необходимая для его создания
+
 {
     “username”: “demo”,
     “first_name”:“Ivan”,
     “last_name”:“Ivanov”
 }
+
 
 Написать тесты и опубликовать исходный код на github.
