@@ -40,11 +40,11 @@ func main() {
 	//Создать пользователя
 	r.HandleFunc("/user", createUsers).Methods("POST")
 	//Удалить пользователя
-	r.HandleFunc("/user/id", deleteUser).Methods("DELETE")
+	r.HandleFunc("/user/{id:[0-9]+}", deleteUser).Methods("DELETE")
 	//Получить пользователя по id
 	r.HandleFunc("/user/{id:[0-9]+}", handlerUser).Methods("GET")
 	//Обновить пользователя
-	r.HandleFunc("/user", updateUser).Methods("PUT")
+	r.HandleFunc("/user/{id:[0-9]+}", updateUser).Methods("PUT")
 
 	log.Println("Server up and run on port " + PORT)
 	log.Fatal(http.ListenAndServe(PORT, r))
@@ -54,8 +54,6 @@ func main() {
 // func handler | Use for get all users
 func handler(w http.ResponseWriter, r *http.Request) {
 
-	//users := []Users{}
-	//var username string
 	rows, err := db.Query("SELECT * FROM users")
 	PanicOnErr(err)
 	defer rows.Close()
@@ -116,7 +114,7 @@ func handlerUser(w http.ResponseWriter, r *http.Request) {
 
 func deleteUser(w http.ResponseWriter, r *http.Request) {
 	//deleteUsers
-	id := r.URL.Path[len("/deleteuser"):]
+	id := r.URL.Path[len("/user/"):]
 	index, _ := strconv.ParseInt(id, 10, 0)
 
 	result, err := db.Exec("DELETE FROM users WHERE id = $1", index)
@@ -134,12 +132,19 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 
 func updateUser(w http.ResponseWriter, r *http.Request) {
 	//update
-	id := r.URL.Path[len("/update"):]
+	id := r.URL.Path[len("/user/"):]
 	index, _ := strconv.ParseInt(id, 10, 0)
 
-	// ДОПИЛИТЬ
+	decoder := json.NewDecoder(r.Body)
+	user := Users{}
+	err := decoder.Decode(&user)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-	result, err := db.Exec("DELETE FROM users WHERE id = $1", index)
+	result, err := db.Exec("UPDATE users SET username = $1, first_name = $2, last_name = $3  WHERE id = $4", user.Name, user.FirstName, user.LastName, index)
 	PanicOnErr(err)
 
 	rowsAffected, err := result.RowsAffected()
