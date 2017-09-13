@@ -27,16 +27,28 @@ func main() {
 
 	app.Command("get", "Run a command request for full users ", func(cmd *cli.Cmd) {
 		cmd.Command("users", " get all users", cli.ActionCommand(func() {
-			res, _ := http.Get(DEFAULT_HOST + "/user")
+			res, err := http.Get(DEFAULT_HOST + "/user")
+			if err != nil {
+				log.Panic(err)
+			}
 
-			body, _ := ioutil.ReadAll(res.Body)
+			body, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				log.Panic(err)
+			}
 
 			println(string(body))
 		}))
 
 		cmd.Command("user", "get user by id", cli.ActionCommand(func() {
-			res, _ := http.Get(DEFAULT_HOST + "/user/" + "2") //localhost:8080/user/2
-			body, _ := ioutil.ReadAll(res.Body)
+			res, err := http.Get(DEFAULT_HOST + "/user/" + "2")
+			if err != nil {
+				log.Panic(err)
+			}
+			body, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				log.Panic(err)
+			}
 			println(string(body))
 		}))
 
@@ -66,8 +78,35 @@ func main() {
 			}
 			b := new(bytes.Buffer)
 			json.NewEncoder(b).Encode(u)
-			res, _ := http.Post(DEFAULT_HOST+"/user", "application/json; charset=utf-8", b)
+			res, err := http.Post(DEFAULT_HOST+"/user", "application/json; charset=utf-8", b)
+			if err != nil {
+				log.Panic(err)
+			}
 			io.Copy(os.Stdout, res.Body)
+		}))
+	})
+
+	app.Command("update", "Update  ", func(cmd *cli.Cmd) {
+		cmd.Command("user", "Update user", cli.ActionCommand(func() {
+			u := User{
+				Name:      "max",
+				FirstName: "Maxim",
+				LastName:  "Kuzmenko",
+			}
+			b := new(bytes.Buffer)
+			json.NewEncoder(b).Encode(u)
+
+			client := &http.Client{}
+			req, err := http.NewRequest("PUT", DEFAULT_HOST+"/user/"+"2", b)
+			if err != nil {
+				log.Panic(err)
+			}
+			_, err = client.Do(req)
+			if err != nil {
+				log.Panic(err)
+			} else {
+				println("Changes added")
+			}
 		}))
 	})
 
