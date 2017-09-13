@@ -34,15 +34,15 @@ func main() {
 	r := mux.NewRouter()
 
 	//Получить всех пользователей
-	r.HandleFunc("/getallusers", handler).Methods("GET")
+	r.HandleFunc("/user", handler).Methods("GET")
 	//Создать пользователя
-	r.HandleFunc("/createuser", createUsers).Methods("POST")
+	r.HandleFunc("/user", createUsers).Methods("POST")
 	//Удалить пользователя
-	r.HandleFunc("/deleteuser", deleteUser).Methods("DELETE")
+	r.HandleFunc("/user/id", deleteUser).Methods("DELETE")
 	//Получить пользователя по id
-	r.HandleFunc("/getuser", handlerUser).Methods("GET")
+	r.HandleFunc("/user/id", handlerUser).Methods("GET")
 	//Обновить пользователя
-	r.HandleFunc("/update", updateUser).Methods("PUT")
+	r.HandleFunc("/user", updateUser).Methods("PUT")
 
 	log.Println("Server up and run on port " + PORT)
 	log.Fatal(http.ListenAndServe(PORT, r))
