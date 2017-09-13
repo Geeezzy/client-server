@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 
@@ -44,9 +45,15 @@ func main() {
 	app.Command("delete", "Delete user", func(cmd *cli.Cmd) {
 		cmd.Command("user", "user by Id", cli.ActionCommand(func() {
 
-			res, _ := http.NewRequest("DELETE", DEFAULT_HOST+"/user/"+"2", nil)
-			body, _ := ioutil.ReadAll(res.Body)
-			println(string(body))
+			client := &http.Client{}
+			req, err := http.NewRequest("DELETE", DEFAULT_HOST+"/user/"+"7", nil)
+			if err != nil {
+				log.Panic(err)
+			}
+			_, err = client.Do(req)
+			if err != nil {
+				log.Panic(err)
+			}
 		}))
 	})
 

@@ -113,6 +113,7 @@ func handlerUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteUser(w http.ResponseWriter, r *http.Request) {
+	log.Print("DELEEEEEEEEEEEEEETE")
 	//deleteUsers
 	id := r.URL.Path[len("/user/"):]
 	index, _ := strconv.ParseInt(id, 10, 0)
