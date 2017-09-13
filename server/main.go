@@ -135,7 +135,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Path[len("/update"):]
 	index, _ := strconv.ParseInt(id, 10, 0)
 
-	// 
+	// ДОПИЛИТЬ
 
 	result, err := db.Exec("DELETE FROM users WHERE id = $1", index)
 	PanicOnErr(err)
