@@ -85,8 +85,6 @@ func createUsers(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(reflect.TypeOf(user.Name))
 
-	//users = append(users, user)
-
 	//INSERT
 
 	result, err := db.Exec("INSERT INTO users (username, first_name, last_name) VALUES ($1, $2, $3)", user.Name, user.FirstName, user.LastName)
@@ -119,7 +117,23 @@ func handlerUser(w http.ResponseWriter, r *http.Request) {
 
 func deleteUser(w http.ResponseWriter, r *http.Request) {
 	//deleteUsers
+	id := r.FormValue("id")
+	if id == "" {
+		http.Error(w, http.StatusText(400), 400)
+		return
+	}
 
+	result, err := db.Exec("DELETE FROM users WHERE id = $1", id)
+	PanicOnErr(err)
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	fmt.Fprintf(w, "User %s delete successfully (%d row affected)\n", id, rowsAffected)
 }
 
 func updateUser(w http.ResponseWriter, r *http.Request) {
