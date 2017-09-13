@@ -33,12 +33,21 @@ func main() {
 			println(string(body))
 		}))
 
-		cmd.Command("user id", "het user by id", cli.ActionCommand(func() {
-			res, _ := http.Get(DEFAULT_HOST + "/user" + "/2")
+		cmd.Command("user", "get user by id", cli.ActionCommand(func() {
+			res, _ := http.Get(DEFAULT_HOST + "/user/" + "2") //localhost:8080/user/2
 			body, _ := ioutil.ReadAll(res.Body)
 			println(string(body))
 		}))
 
+	})
+
+	app.Command("delete", "Delete user", func(cmd *cli.Cmd) {
+		cmd.Command("user", "user by Id", cli.ActionCommand(func() {
+
+			res, _ := http.NewRequest("DELETE", DEFAULT_HOST+"/user/"+"2", nil)
+			body, _ := ioutil.ReadAll(res.Body)
+			println(string(body))
+		}))
 	})
 
 	app.Command("create", "Create users and ..", func(cmd *cli.Cmd) {

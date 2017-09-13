@@ -8,9 +8,10 @@ import (
 	"net/http"
 	"reflect"
 
+	"strconv"
+
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
-	"strconv"
 )
 
 //Users структура для парсинга json
@@ -41,7 +42,7 @@ func main() {
 	//Удалить пользователя
 	r.HandleFunc("/user/id", deleteUser).Methods("DELETE")
 	//Получить пользователя по id
-	r.HandleFunc("/user/id", handlerUser).Methods("GET")
+	r.HandleFunc("/user/{id:[0-9]+}", handlerUser).Methods("GET")
 	//Обновить пользователя
 	r.HandleFunc("/user", updateUser).Methods("PUT")
 
@@ -96,7 +97,8 @@ func createUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlerUser(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Path[len("/getuser"):]
+	log.Println(" Я вошел!")
+	id := r.URL.Path[len("/user/"):]
 	index, _ := strconv.ParseInt(id, 10, 0)
 
 	row := db.QueryRow("SELECT * FROM users WHERE id = $1", index)
