@@ -41,6 +41,7 @@ func main() {
 		}))
 
 		cmd.Command("user", "get user by id", cli.ActionCommand(func() {
+			//доописать ввод id с клавы
 			res, err := http.Get(DEFAULT_HOST + "/user/" + "2")
 			if err != nil {
 				log.Panic(err)
@@ -56,7 +57,7 @@ func main() {
 
 	app.Command("delete", "Delete user", func(cmd *cli.Cmd) {
 		cmd.Command("user", "user by Id", cli.ActionCommand(func() {
-
+			//ввод с клавы
 			client := &http.Client{}
 			req, err := http.NewRequest("DELETE", DEFAULT_HOST+"/user/"+"7", nil)
 			if err != nil {
@@ -70,14 +71,15 @@ func main() {
 	})
 
 	app.Command("create", "Create users and ..", func(cmd *cli.Cmd) {
+		//переписать с files.go
 		cmd.Command("user", "create user", cli.ActionCommand(func() {
-			u := User{
-				Name:      "kleva",
-				FirstName: "Kirill",
-				LastName:  "Levin",
+
+			bs, err := ioutil.ReadFile("files/name.json")
+			if err != nil {
+				return
 			}
-			b := new(bytes.Buffer)
-			json.NewEncoder(b).Encode(u)
+			b := bytes.NewBuffer(bs)
+
 			res, err := http.Post(DEFAULT_HOST+"/user", "application/json; charset=utf-8", b)
 			if err != nil {
 				log.Panic(err)
@@ -87,11 +89,12 @@ func main() {
 	})
 
 	app.Command("update", "Update  ", func(cmd *cli.Cmd) {
+		//переписать с files.go и ввод id
 		cmd.Command("user", "Update user", cli.ActionCommand(func() {
 			u := User{
-				Name:      "max",
-				FirstName: "Maxim",
-				LastName:  "Kuzmenko",
+				Name:      "lex",
+				FirstName: "Petr",
+				LastName:  "Moooo",
 			}
 			b := new(bytes.Buffer)
 			json.NewEncoder(b).Encode(u)
