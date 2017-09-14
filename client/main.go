@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -39,7 +40,7 @@ func main() {
 
 			println(string(body))
 		}))
-
+		//СДЕЛАТЬ ФЛАГ ID
 		cmd.Command("user", "get user by id", cli.ActionCommand(func() {
 			//доописать ввод id с клавы
 			res, err := http.Get(DEFAULT_HOST + "/user/" + "2")
@@ -55,11 +56,13 @@ func main() {
 
 	})
 
+	//СДЕЛАТЬ ФЛАГ ID
+
 	app.Command("delete", "Delete user", func(cmd *cli.Cmd) {
 		cmd.Command("user", "user by Id", cli.ActionCommand(func() {
 			//ввод с клавы
 			client := &http.Client{}
-			req, err := http.NewRequest("DELETE", DEFAULT_HOST+"/user/"+"7", nil)
+			req, err := http.NewRequest("DELETE", DEFAULT_HOST+"/user/"+"3", nil)
 			if err != nil {
 				log.Panic(err)
 			}
@@ -72,21 +75,39 @@ func main() {
 
 	app.Command("create", "Create users and ..", func(cmd *cli.Cmd) {
 		//переписать с files.go
-		cmd.Command("user", "create user", cli.ActionCommand(func() {
+		cmd.Command("user", "create user", (func(sc *cli.Cmd) {
 
-			bs, err := ioutil.ReadFile("files/name.json")
-			if err != nil {
-				return
-			}
-			b := bytes.NewBuffer(bs)
+			sc.Spec = "[-r] DST "
 
-			res, err := http.Post(DEFAULT_HOST+"/user", "application/json; charset=utf-8", b)
-			if err != nil {
-				log.Panic(err)
+			var (
+				recursive = sc.BoolOpt("r recursive", false, "Copy files recursively")
+				src       = sc.StringArg("DST", "", "Destination where to copy files to")
+			)
+
+			sc.Action = func() {
+				fmt.Printf("%T\n", *src)
+				fmt.Println(len(*src))
+				fmt.Println(*src)
+				fmt.Printf("Copying %s to [recursively: %v ]\n", *src, *recursive)
+
+				bs, err := ioutil.ReadFile(*src)
+				if err != nil {
+					panic(err)
+					return
+				}
+				log.Println("Не соснули")
+				b := bytes.NewBuffer(bs)
+
+				res, err := http.Post(DEFAULT_HOST+"/user", "application/json; charset=utf-8", b)
+				if err != nil {
+					log.Panic(err)
+				}
+				io.Copy(os.Stdout, res.Body)
 			}
-			io.Copy(os.Stdout, res.Body)
 		}))
 	})
+
+	//СДЕЛАТЬ ФЛАГ ID и ПУТЬ ДО ФАЙЛА
 
 	app.Command("update", "Update  ", func(cmd *cli.Cmd) {
 		//переписать с files.go и ввод id
