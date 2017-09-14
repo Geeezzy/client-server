@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"reflect"
-
 	"strconv"
 
 	"github.com/gorilla/mux"

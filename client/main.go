@@ -76,7 +76,7 @@ func main() {
 			sc.Action = func() {
 				fmt.Printf("Delete id %s to [sucsessful: %v ]\n", *id, *checkId)
 				client := &http.Client{}
-				req, err := http.NewRequest("DELETE", DEFAULT_HOST+"/user/"+*id, nil)
+				req, err := http.NewRequest("DELETE", DEFAULT_HOST + "/user/"+*id, nil)
 				if err != nil {
 					log.Panic(err)
 				}
