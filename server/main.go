@@ -83,9 +83,6 @@ func createUsers(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	fmt.Println(reflect.TypeOf(user.Name))
-
-	//INSERT
 
 	result, err := db.Exec("INSERT INTO users (username, first_name, last_name) VALUES ($1, $2, $3)", user.Name, user.FirstName, user.LastName)
 	PanicOnErr(err)
@@ -95,7 +92,6 @@ func createUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlerUser(w http.ResponseWriter, r *http.Request) {
-	log.Println(" Я вошел!")
 	id := r.URL.Path[len("/user/"):]
 	index, _ := strconv.ParseInt(id, 10, 0)
 
@@ -113,7 +109,6 @@ func handlerUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteUser(w http.ResponseWriter, r *http.Request) {
-	log.Print("DELEEEEEEEEEEEEEETE")
 	//deleteUsers
 	id := r.URL.Path[len("/user/"):]
 	index, _ := strconv.ParseInt(id, 10, 0)
@@ -155,7 +150,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	fmt.Fprintf(w, "User %s delete successfully (%d row affected)\n", id, rowsAffected)
+	fmt.Fprintf(w, "User %s update successfully (%d row affected)\n", id, rowsAffected)
 
 }
 
