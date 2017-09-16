@@ -27,6 +27,8 @@ var (
 
 //PORT Порт
 const PORT string = ":8080"
+const DB_CONNECT_STRING =
+	"host= 172.17.0.2 port=5432 user=postgres  dbname=clienserver sslmode=disable"
 
 func main() {
 	DBconnect()
@@ -50,6 +52,9 @@ func main() {
 }
 
 // func handler | Use for get all users
+func testall(w http.ResponseWriter, r *http.Request){
+	w.Write([]byte("Hello world!"))
+}
 func handler(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := db.Query("SELECT * FROM users")
@@ -155,7 +160,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 //DBconnect run and connect DB
 func DBconnect() {
 	var err error
-	db, err = sql.Open("postgres", "user=postgres dbname=clienserver sslmode=disable")
+	db, err = sql.Open("postgres", DB_CONNECT_STRING)
 	PanicOnErr(err)
 
 	err = db.Ping()
