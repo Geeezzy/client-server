@@ -28,7 +28,7 @@ var (
 //PORT Порт
 const PORT string = ":8080"
 const DB_CONNECT_STRING =
-	"host= 172.17.0.2 port=5432 user=postgres  dbname=clienserver sslmode=disable"
+	"host= 172.17.0.2 port=5432 user=postgres  password= docker dbname=clientserver sslmode=disable"
 
 func main() {
 	DBconnect()

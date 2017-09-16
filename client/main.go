@@ -10,10 +10,10 @@ import (
 	"os"
 
 	cli "github.com/jawher/mow.cli"
-	//"github.com/jawher/mow.cli"
+
 )
 
-const DEFAULT_HOST = "http://localhost:8080"
+const DEFAULT_HOST = "http://localhost:6060"
 
 type User struct {
 	Name      string `json:"name"`
