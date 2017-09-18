@@ -31,12 +31,13 @@ const DB_CONNECT_STRING =
 	"host= 172.17.0.2 port=5432 user=postgres  password= docker dbname=clientserver sslmode=disable"
 
 func main() {
-	DBconnect()
+	//DBconnect()
+	InitDB(DB_CONNECT_STRING)
 	//Run server and routes
 	r := mux.NewRouter()
 
 	//Получить всех пользователей
-	r.HandleFunc("/user", Getusers).Methods("GET")
+	r.HandleFunc("/user", GetUsers).Methods("GET")
 	//Создать пользователя
 	r.HandleFunc("/user", CreateUsers).Methods("POST")
 	//Удалить пользователя
@@ -51,10 +52,13 @@ func main() {
 
 }
 
-func Getusers(w http.ResponseWriter, r *http.Request) {
+func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := db.Query("SELECT * FROM users")
-	PanicOnErr(err)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
 	defer rows.Close()
 
 	users := make([]*Users, 0)
@@ -161,6 +165,18 @@ func DBconnect() {
 
 	err = db.Ping()
 	PanicOnErr(err)
+}
+
+func InitDB(dataSourceName string) {
+	var err error
+	db, err = sql.Open("postgres", dataSourceName)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if err = db.Ping(); err != nil {
+		log.Panic(err)
+	}
 }
 
 //PanicOnErr panics on error
