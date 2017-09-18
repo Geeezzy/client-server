@@ -30,9 +30,21 @@ const PORT string = ":8080"
 const DB_CONNECT_STRING =
 	"host= 172.17.0.2 port=5432 user=postgres  password= docker dbname=clientserver sslmode=disable"
 
+func init() {
+	var err error
+	db, err = sql.Open("postgres", DB_CONNECT_STRING)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if err = db.Ping(); err != nil {
+		log.Panic(err)
+	}
+}
+
+
 func main() {
-	//DBconnect()
-	InitDB(DB_CONNECT_STRING)
+
 	//Run server and routes
 	r := mux.NewRouter()
 
@@ -155,28 +167,6 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprintf(w, "User %s update successfully (%d row affected)\n", id, rowsAffected)
 
-}
-
-//DBconnect run and connect DB
-func DBconnect() {
-	var err error
-	db, err = sql.Open("postgres", DB_CONNECT_STRING)
-	PanicOnErr(err)
-
-	err = db.Ping()
-	PanicOnErr(err)
-}
-
-func InitDB(dataSourceName string) {
-	var err error
-	db, err = sql.Open("postgres", dataSourceName)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	if err = db.Ping(); err != nil {
-		log.Panic(err)
-	}
 }
 
 //PanicOnErr panics on error
