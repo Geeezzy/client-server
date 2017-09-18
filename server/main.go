@@ -102,7 +102,9 @@ func CreateUsers(w http.ResponseWriter, r *http.Request) {
 	result, err := db.Exec("INSERT INTO users (username, first_name, last_name) VALUES ($1, $2, $3)", user.Name, user.FirstName, user.LastName)
 	PanicOnErr(err)
 
-	fmt.Println(result)
+	lastInsertId,err := result.LastInsertId()
+	fmt.Println(lastInsertId)
+	w.WriteHeader(http.StatusOK)
 
 }
 
@@ -139,6 +141,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprintf(w, "User %s delete successfully (%d row affected)\n", id, rowsAffected)
+	w.WriteHeader(http.StatusOK)
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -166,6 +169,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprintf(w, "User %s update successfully (%d row affected)\n", id, rowsAffected)
+	w.WriteHeader(http.StatusOK)
 
 }
 
