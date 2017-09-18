@@ -39,7 +39,7 @@ func main() {
 
 			println(string(body))
 		}))
-		//СДЕЛАТЬ ФЛАГ ID
+
 		cmd.Command("user", "get user by id", func(sc *cli.Cmd) {
 			//доописать ввод id с клавы
 			sc.Spec = "[-i] ID "

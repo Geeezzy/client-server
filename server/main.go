@@ -36,26 +36,22 @@ func main() {
 	r := mux.NewRouter()
 
 	//Получить всех пользователей
-	r.HandleFunc("/user", handler).Methods("GET")
+	r.HandleFunc("/user", Getusers).Methods("GET")
 	//Создать пользователя
-	r.HandleFunc("/user", createUsers).Methods("POST")
+	r.HandleFunc("/user", CreateUsers).Methods("POST")
 	//Удалить пользователя
-	r.HandleFunc("/user/{id:[0-9]+}", deleteUser).Methods("DELETE")
+	r.HandleFunc("/user/{id:[0-9]+}", DeleteUser).Methods("DELETE")
 	//Получить пользователя по id
-	r.HandleFunc("/user/{id:[0-9]+}", handlerUser).Methods("GET")
+	r.HandleFunc("/user/{id:[0-9]+}", GetUserById).Methods("GET")
 	//Обновить пользователя
-	r.HandleFunc("/user/{id:[0-9]+}", updateUser).Methods("PUT")
+	r.HandleFunc("/user/{id:[0-9]+}", UpdateUser).Methods("PUT")
 
 	log.Println("Server up and run on port " + PORT)
 	log.Fatal(http.ListenAndServe(PORT, r))
 
 }
 
-// func handler | Use for get all users
-func testall(w http.ResponseWriter, r *http.Request){
-	w.Write([]byte("Hello world!"))
-}
-func handler(w http.ResponseWriter, r *http.Request) {
+func Getusers(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := db.Query("SELECT * FROM users")
 	PanicOnErr(err)
@@ -76,7 +72,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	w.Write(productsJson)
 }
 
-func createUsers(w http.ResponseWriter, r *http.Request) {
+func CreateUsers(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	user := Users{}
 
@@ -94,7 +90,7 @@ func createUsers(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func handlerUser(w http.ResponseWriter, r *http.Request) {
+func GetUserById(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Path[len("/user/"):]
 	index, _ := strconv.ParseInt(id, 10, 0)
 
@@ -111,7 +107,7 @@ func handlerUser(w http.ResponseWriter, r *http.Request) {
 	w.Write(productsJson)
 }
 
-func deleteUser(w http.ResponseWriter, r *http.Request) {
+func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	//deleteUsers
 	id := r.URL.Path[len("/user/"):]
 	index, _ := strconv.ParseInt(id, 10, 0)
@@ -129,7 +125,7 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "User %s delete successfully (%d row affected)\n", id, rowsAffected)
 }
 
-func updateUser(w http.ResponseWriter, r *http.Request) {
+func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	//update
 	id := r.URL.Path[len("/user/"):]
 	index, _ := strconv.ParseInt(id, 10, 0)
