@@ -13,13 +13,76 @@ import (
 
 )
 
-const DEFAULT_HOST = "http://localhost:6060"
+const DEFAULT_HOST = "http://localhost:8080"
 
 type User struct {
 	Name      string `json:"name"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 }
+
+func GetAction(checkId *bool, id *string)  {
+		fmt.Printf("get id %s to [sucsessful: %v ]\n", *id, *checkId)
+		res, err := http.Get(DEFAULT_HOST + "/user/" + *id)
+		if err != nil {
+			log.Panic(err)
+		}
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			log.Panic(err)
+		}
+		println(string(body))
+}
+func DeleteAction(checkId *bool, id *string) {
+		fmt.Printf("Delete id %s to [sucsessful: %v ]\n", *id, *checkId)
+		client := &http.Client{}
+		req, err := http.NewRequest("DELETE", DEFAULT_HOST + "/user/" + *id, nil)
+		if err != nil {
+			log.Panic(err)
+		}
+		_, err = client.Do(req)
+		if err != nil {
+			log.Panic(err)
+		}
+}
+func CreateAction(checkPath *bool, path *string){
+		fmt.Printf("Create user to [sucsessful: %v ]\n",  *checkPath)
+		bs, err := ioutil.ReadFile(*path)
+		if err != nil {
+			panic(err)
+			return
+		}
+
+		b := bytes.NewBuffer(bs)
+
+		res, err := http.Post(DEFAULT_HOST+"/user", "application/json; charset=utf-8", b)
+		if err != nil {
+			log.Panic(err)
+		}
+		io.Copy(os.Stdout, res.Body)
+}
+func UpdateAction(checkId *bool, id *string, path *string){
+
+		bs, err := ioutil.ReadFile(*path)
+		if err != nil {
+			panic(err)
+			return
+		}
+
+		b := bytes.NewBuffer(bs)
+		fmt.Printf("Update %s to [sucsessful: %v ] , %s\n", *id, *checkId, *path)
+
+		client := &http.Client{}
+		req, err := http.NewRequest("PUT", DEFAULT_HOST+"/user/"+*id, b)
+		if err != nil {
+			log.Panic(err)
+		}
+		_, err = client.Do(req)
+		if err != nil {
+			log.Panic(err)
+		}
+}
+
 
 func main() {
 
@@ -49,16 +112,7 @@ func main() {
 				id       = sc.StringArg("ID", "", "What id to use")
 			)
 			sc.Action = func() {
-				fmt.Printf("get id %s to [sucsessful: %v ]\n", *id, *checkId)
-				res, err := http.Get(DEFAULT_HOST + "/user/" + *id)
-				if err != nil {
-					log.Panic(err)
-				}
-				body, err := ioutil.ReadAll(res.Body)
-				if err != nil {
-					log.Panic(err)
-				}
-				println(string(body))
+				GetAction(checkId, id)
 			}
 		})
 
@@ -74,17 +128,9 @@ func main() {
 				id       = sc.StringArg("ID", "", "What id to use")
 			)
 			sc.Action = func() {
-				fmt.Printf("Delete id %s to [sucsessful: %v ]\n", *id, *checkId)
-				client := &http.Client{}
-				req, err := http.NewRequest("DELETE", DEFAULT_HOST + "/user/"+*id, nil)
-				if err != nil {
-					log.Panic(err)
-				}
-				_, err = client.Do(req)
-				if err != nil {
-					log.Panic(err)
-				}
+				DeleteAction(checkId, id)
 			}
+
 		})
 	})
 
@@ -97,23 +143,8 @@ func main() {
 				checkPath = sc.BoolOpt("f force", false, "Read path")
 				path       = sc.StringArg("PATH", "", "The path to the file")
 			)
-
 			sc.Action = func() {
-				fmt.Printf("Create user to [sucsessful: %v ]\n",  *checkPath)
-
-				bs, err := ioutil.ReadFile(*path)
-				if err != nil {
-					panic(err)
-					return
-				}
-
-				b := bytes.NewBuffer(bs)
-
-				res, err := http.Post(DEFAULT_HOST+"/user", "application/json; charset=utf-8", b)
-				if err != nil {
-					log.Panic(err)
-				}
-				io.Copy(os.Stdout, res.Body)
+				CreateAction(checkPath, path)
 			}
 		})
 	})
@@ -126,27 +157,8 @@ func main() {
 				id 	= sc.StringArg("ID", "", "What id to use")
 				path       = sc.StringArg("PATH", "", "The path to the file")
 			)
-
 			sc.Action = func() {
-				bs, err := ioutil.ReadFile(*path)
-				if err != nil {
-					panic(err)
-					return
-				}
-
-				b := bytes.NewBuffer(bs)
-				fmt.Printf("Update %s to [sucsessful: %v ] , %s\n", *id, *checkId, *path)
-
-				client := &http.Client{}
-				req, err := http.NewRequest("PUT", DEFAULT_HOST+"/user/"+*id, b)
-				if err != nil {
-					log.Panic(err)
-				}
-				_, err = client.Do(req)
-				if err != nil {
-					log.Panic(err)
-				}
-
+				UpdateAction(checkId, id, path)
 			}
 		})
 	})

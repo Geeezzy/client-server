@@ -42,7 +42,6 @@ func init() {
 	}
 }
 
-
 func main() {
 
 	//Run server and routes
