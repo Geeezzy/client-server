@@ -21,13 +21,13 @@ type User struct {
 	LastName  string `json:"last_name"`
 }
 
-func GetAction(checkId *bool, id *string)  {
+func GetAction(checkId *bool, id *string) {
 		fmt.Printf("get id %s to [sucsessful: %v ]\n", *id, *checkId)
 		res, err := http.Get(DEFAULT_HOST + "/user/" + *id)
 		if err != nil {
 			log.Panic(err)
 		}
-		body, err := ioutil.ReadAll(res.Body)
+		body, err:= ioutil.ReadAll(res.Body)
 		if err != nil {
 			log.Panic(err)
 		}
