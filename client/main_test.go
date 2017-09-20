@@ -4,31 +4,64 @@ import (
 	"testing"
 	"net/http/httptest"
 	"net/http"
-
-
-	//"log"
-	//"io/ioutil"
-	"fmt"
-	"log"
-	"io/ioutil"
 )
-
-func TestGetAction(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Hello, client")
+func TestGetUsers(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
 	}))
-	defer ts.Close()
+	defer server.Close()
 
-	ts.URL = DEFAULT_HOST
+	resp := GetUsers(server.URL)
 
+	if resp != "200 OK" {
+		t.Error("BadRequest")
+	}
 }
+func TestGetUserById(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
 
-/*func TestCreateAction(t *testing.T) {
+	resp := GetUserById("2", server.URL)
 
+	if resp != "200 OK" {
+		t.Error("BadRequest")
+	}
 }
-/*func TestDeleteAction(t *testing.T) {
+func TestDeleteUser(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
 
+	resp := DeleteUser("2", server.URL)
+
+	if resp != "200 OK" {
+		t.Error("BadRequest")
+	}
 }
-func TestUpdateAction(t *testing.T) {
+func TestCreateUser(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
 
-}*/
+	resp := CreateUser("files/addUser.json", server.URL)
+
+	if resp != "200 OK" {
+		t.Error("BadRequest")
+	}
+}
+func TestUpdateUser(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	resp := UpdateUser("files/updateUser.json", "2", server.URL)
+
+	if resp != "200 OK" {
+		t.Error("BadRequest")
+	}
+}

@@ -21,9 +21,24 @@ type User struct {
 	LastName  string `json:"last_name"`
 }
 
-func GetAction(checkId *bool, id *string) {
-		fmt.Printf("get id %s to [sucsessful: %v ]\n", *id, *checkId)
-		res, err := http.Get(DEFAULT_HOST + "/user/" + *id)
+func GetUsers(host string) string{
+	res, err := http.Get(host + "/user")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	println(string(body))
+
+	return res.Status
+}
+func GetUserById(id string, host string) string{
+
+		res, err := http.Get(host + "/user/" + id)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -32,55 +47,58 @@ func GetAction(checkId *bool, id *string) {
 			log.Panic(err)
 		}
 		println(string(body))
+
+		return res.Status
 }
-func DeleteAction(checkId *bool, id *string) {
-		fmt.Printf("Delete id %s to [sucsessful: %v ]\n", *id, *checkId)
+func DeleteUser(id string, host string) string{
 		client := &http.Client{}
-		req, err := http.NewRequest("DELETE", DEFAULT_HOST + "/user/" + *id, nil)
+		req, err := http.NewRequest("DELETE", host + "/user/" + id, nil)
 		if err != nil {
 			log.Panic(err)
 		}
-		_, err = client.Do(req)
+		resp, err := client.Do(req)
 		if err != nil {
 			log.Panic(err)
 		}
+
+		return resp.Status
 }
-func CreateAction(checkPath *bool, path *string){
-		fmt.Printf("Create user to [sucsessful: %v ]\n",  *checkPath)
-		bs, err := ioutil.ReadFile(*path)
+func CreateUser(path string, host string) string{
+
+		bs, err := ioutil.ReadFile(path)
 		if err != nil {
 			panic(err)
-			return
 		}
 
 		b := bytes.NewBuffer(bs)
 
-		res, err := http.Post(DEFAULT_HOST+"/user", "application/json; charset=utf-8", b)
+		res, err := http.Post(host + "/user", "application/json; charset=utf-8", b)
 		if err != nil {
 			log.Panic(err)
 		}
 		io.Copy(os.Stdout, res.Body)
-}
-func UpdateAction(checkId *bool, id *string, path *string){
 
-		bs, err := ioutil.ReadFile(*path)
+		return res.Status
+}
+func UpdateUser(path string, id string, host string) string{
+
+		bs, err := ioutil.ReadFile(path)
 		if err != nil {
 			panic(err)
-			return
 		}
 
 		b := bytes.NewBuffer(bs)
-		fmt.Printf("Update %s to [sucsessful: %v ] , %s\n", *id, *checkId, *path)
 
 		client := &http.Client{}
-		req, err := http.NewRequest("PUT", DEFAULT_HOST+"/user/"+*id, b)
+		req, err := http.NewRequest("PUT", host + "/user/" + id, b)
 		if err != nil {
 			log.Panic(err)
 		}
-		_, err = client.Do(req)
+		resp, err := client.Do(req)
 		if err != nil {
 			log.Panic(err)
 		}
+		return resp.Status
 }
 
 
@@ -90,17 +108,7 @@ func main() {
 
 	app.Command("get", "Run a command request for full users ", func(cmd *cli.Cmd) {
 		cmd.Command("users", " get all users", cli.ActionCommand(func() {
-			res, err := http.Get(DEFAULT_HOST + "/user")
-			if err != nil {
-				log.Panic(err)
-			}
-
-			body, err := ioutil.ReadAll(res.Body)
-			if err != nil {
-				log.Panic(err)
-			}
-
-			println(string(body))
+			GetUsers(DEFAULT_HOST)
 		}))
 
 		cmd.Command("user", "get user by id", func(sc *cli.Cmd) {
@@ -111,8 +119,11 @@ func main() {
 				checkId = sc.BoolOpt("i id", false, "Read id")
 				id       = sc.StringArg("ID", "", "What id to use")
 			)
+
 			sc.Action = func() {
-				GetAction(checkId, id)
+				fmt.Printf("get id %s to [sucsessful: %v ]\n", *id, *checkId)
+				//localId := *id
+				GetUserById(*id, DEFAULT_HOST)
 			}
 		})
 
@@ -128,7 +139,8 @@ func main() {
 				id       = sc.StringArg("ID", "", "What id to use")
 			)
 			sc.Action = func() {
-				DeleteAction(checkId, id)
+				fmt.Printf("Delete id %s to [sucsessful: %v ]\n", *id, *checkId)
+				DeleteUser(*id, DEFAULT_HOST)
 			}
 
 		})
@@ -144,7 +156,8 @@ func main() {
 				path       = sc.StringArg("PATH", "", "The path to the file")
 			)
 			sc.Action = func() {
-				CreateAction(checkPath, path)
+				fmt.Printf("Create user to [sucsessful: %v ]\n",  *checkPath)
+				CreateUser(*path, DEFAULT_HOST)
 			}
 		})
 	})
@@ -158,7 +171,8 @@ func main() {
 				path       = sc.StringArg("PATH", "", "The path to the file")
 			)
 			sc.Action = func() {
-				UpdateAction(checkId, id, path)
+				fmt.Printf("Update %s to [sucsessful: %v ] , %s\n", id, *checkId, *path)
+				UpdateUser(*path, *id, DEFAULT_HOST)
 			}
 		})
 	})
