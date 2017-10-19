@@ -1,7 +1,6 @@
 # CLIENT-SERVER APP
 ## Simple realisation of application rest api on Golang..
 
----
 ## Task
 Требуется реализовать клиент-серверное приложение на языке программирования Golang. Протокол общения rest api.
 
@@ -39,7 +38,7 @@ docker build -t client-server .
 
 docker run --publish 6060:8080 --name app --rm client-server
 
-###Команды для запуска сервера БД
+### Команды для запуска сервера БД
 
 docker build -t db_serv .
 
